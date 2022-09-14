@@ -1,6 +1,6 @@
 ---
- - name: Build Docker Container Image and Run
-   hosts: node.BookMyShow.com
+ - name: Copy war file and Docker file
+   hosts: node.AetnaHealthcare.com
    become: yes
    tasks:
 
@@ -13,7 +13,7 @@
          mode: '0755'
 
      - name: Copy War file
-       shell: cp -r /home/jenkins/workspace/BookMyShow/target/BookMyShow_UserBook-2.0.war /home/ubuntu/Docker-Work/
+       shell: cp -r /home/jenkins/workspace/B-Safe/target/AetnaHealthCareUsers-1.0.war /home/ubuntu/Docker-Work/
 
      - name: Copy Dockerfile
        template: 
