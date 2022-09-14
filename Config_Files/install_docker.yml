@@ -1,6 +1,6 @@
 ---
  - name: Setup Docker
-   hosts: node.BSafe.com
+   hosts: node.AetnaHealthcare.com
    become: yes
    tasks:
      - name: Install docker dependencies
