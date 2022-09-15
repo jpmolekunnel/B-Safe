@@ -19,4 +19,10 @@
        template: 
          src: Dockerfile
          dest: "/home/ubuntu/Docker-Work/Dockerfile"
+     
+     - name: Build Container Image
+       shell: sudo docker build -t aetnahealthcareusers:latest /home/ubuntu/Docker-Work/
+       register: container_status
 
+     - debug:
+         var: container_status.stdout_lines
