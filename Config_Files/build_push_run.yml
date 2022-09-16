@@ -1,0 +1,78 @@
+---
+ - name: Copy war file and Docker file
+   hosts: node.AetnaHealthcare.com
+   become: yes
+   tasks:
+
+     - name: Create Directory
+       file:
+         path: /home/ubuntu/Docker-Work
+         state: directory
+         owner: root
+         group: root
+         mode: '0755'
+
+     - name: Copy War file
+       shell: cp -r /home/jenkins/workspace/B-Safe/target/AetnaHealthCareUsers-1.0.war /home/ubuntu/Docker-Work/
+
+     - name: Copy Dockerfile
+       template: 
+         src: Dockerfile
+         dest: "/home/ubuntu/Docker-Work/Dockerfile"
+     
+     - name: Build Container Image
+       shell: sudo docker build -t aetnahealthcareusers:latest /home/ubuntu/Docker-Work/
+       register: container_status
+
+     - debug:
+         var: container_status.stdout_lines
+
+     - name: Run Local Docker Registry
+       shell: sudo docker run --detach --publish 5000:5000 --restart always registry:2
+       register: registry_status
+
+     - debug:
+         var: registry_status.stdout_lines
+
+     - name: Docker Registry Status
+       shell: sudo docker ps
+       register: docker_ps
+
+     - debug:
+         var: docker_ps.stdout_lines
+
+     - name: Copy daemon.json
+       copy:
+         src: daemon.json
+         dest: /etc/docker/daemon.json
+
+     - name: Restart Docker Service
+       shell: sudo service docker restart
+
+     - name: Tag the Build Image
+       shell: sudo docker tag aetnahealthcareusers:latest node.AetnaHealthcare.com:5000/aetnahealthcareusers:latest
+       register: tag_status
+
+     - debug:
+         var: tag_status.stdout_lines
+
+     - name: Push Docker Image to Local Registry 
+       shell: sudo docker push node.AetnaHealthcare.com:5000/aetnahealthcareusers:latest
+       register: docker_push
+
+     - debug:
+         var: docker_push.stdout_lines
+
+     - name: Pull Build Image From Local Registry
+       shell: sudo docker pull node.AetnaHealthcare.com:5000/aetnahealthcareusers:latest
+       register: docker_pull
+
+     - debug:
+         var: docker_pull.stdout_lines
+
+     - name: Run Container Application
+       shell: sudo docker run -d -p 8080:8080 aetnahealthcareusers
+       register: Status
+
+     - debug:
+         var: Status.stdout_lines
