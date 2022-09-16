@@ -1,5 +1,5 @@
 ---
- - name: Copy war file and Docker file
+ - name: Build Push Run a Container Image
    hosts: node.AetnaHealthcare.com
    become: yes
    tasks:
